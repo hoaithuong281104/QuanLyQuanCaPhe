@@ -1,11 +1,11 @@
 USE master;  
 GO  
-IF DB_ID (N'QTCSDL') IS NOT NULL  
-DROP DATABASE QTCSDL;  
+IF DB_ID (N'NHOM05') IS NOT NULL  
+DROP DATABASE NHOM05;  
 GO  
-CREATE DATABASE QTCSDL  
+CREATE DATABASE NHOM05  
 go
-use QTCSDL
+use NHOM05
 go
 --Bảng Hàng
 Create table Hang(
@@ -80,5 +80,3 @@ CREATE TABLE TaiKhoan(
 	MatKhau varchar(20),
 	Quyen bit)
 	--QL:0, NV:1
-
-
