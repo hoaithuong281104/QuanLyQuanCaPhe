@@ -1,4 +1,4 @@
---1.Data bảng Hang
+﻿--1.Data bảng Hang
 CREATE PROCEDURE ThemDataHang
 AS
 BEGIN
@@ -225,5 +225,3 @@ Select * from MonNuoc
 SELECT * FROM BanHang
 SELECT * FROM BanHang_CT
 SELECT * FROM TaiKhoan
-
-
