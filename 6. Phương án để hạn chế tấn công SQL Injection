@@ -1,0 +1,72 @@
+Bước 1: Tạo thủ tục KiemTraDangNhap với các biến @username, @password, @tbao
+Bước 2: Kiểm tra Tên Đăng nhập và Mật khẩu không được để trống, nếu để trống thì báo lỗi “Đăng nhập thất bại”
+Bước 3: Kiểm tra Tên Đăng nhập và Mật khẩu chỉ cho nhập các ký tự chữ cái và số, nếu nhập các ký tự khác thì báo lỗi “Đăng nhập thất bại”
+Bước 4: Mã hóa @password bằng hàm HASHBYTES (thuật toán MD5)
+Bước 5: Kiểm tra thông tin Tên Đăng nhập và Mật khẩu có đúng so với trong CSDL hay không.
+Bước 4.1 Nếu không trùng trong CSDL thì thông báo lỗi  “Đăng nhập thất bại”
+Bước 4.2 Ngược lại thì thông báo “Đăng nhập thành công” và truy cập vào trong CSDL
+
+Code:
+CREATE PROCEDURE KiemTraDangNhap
+    @username VARCHAR(200),
+    @password VARCHAR(200),
+    @tbao VARCHAR(200) OUTPUT
+AS
+BEGIN
+    --  Kiểm tra tên đăng nhập và mật khẩu không được để trống
+    IF @username IS NULL OR @username = ''
+    BEGIN
+        SET @tbao = N'Đăng nhập thất bại!';
+        RETURN;
+    END
+
+    IF @password IS NULL OR @password = ''
+    BEGIN
+        SET @tbao = N'Đăng nhập thất bại!';
+        RETURN;
+    END
+
+    -- Kiểm tra TenDN và MatKhau chỉ chứa chữ cái và số
+    IF PATINDEX('%[^a-zA-Z0-9]%', @username) > 0
+    BEGIN
+        SET @tbao = N'Đăng nhập thất bại!';
+        RETURN;
+    END
+
+	IF PATINDEX('%[^a-zA-Z0-9]%', @password) > 0
+    BEGIN
+        SET @tbao = N'Đăng nhập thất bại!';
+        RETURN;
+    END
+
+	-- Mã hóa mật khẩu nhập vào bằng HASHBYTES('MD5') để so sánh
+    DECLARE @hashedPassword VARBINARY(16);
+    SET @hashedPassword = HASHBYTES('MD5', @password);
+
+    -- Kiểm tra xem thông tin đăng nhập có đúng không
+    DECLARE @ktr INT;
+    SELECT @ktr = COUNT(*) 
+    FROM TaiKhoan 
+	WHERE TenDN = @username AND MatKhau = CONVERT(VARBINARY(16), @hashedPassword);
+
+    IF @ktr < 1
+    BEGIN
+        SET @tbao = N'Đăng nhập thất bại!';
+        RETURN;
+    END
+
+    -- Nếu đăng nhập thành công
+    SET @tbao = N'Đăng nhập thành công!';
+END
+
+
+--Test truong hop dung
+declare @tbao varchar(200) --Truong hop dung
+exec KiemTraDangNhap 'TK0001', '8094', @tbao = @tbao output
+print @tbao
+
+--Test truong hop sai
+declare @tbao varchar(200)
+exec KiemTraDangNhap 'TK0001', 'Khangdzvai', @tbao = @tbao output
+print @tbao
+
